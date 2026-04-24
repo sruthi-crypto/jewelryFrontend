@@ -7,6 +7,7 @@ export interface MediaItem {
   name: string;
 }
 
+
 export interface Product {
   id: string;
   title: string;
@@ -75,7 +76,7 @@ export function loadStore(): StoreState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch { }
   return { products: defaultProducts, isAdminLoggedIn: false, isUserLoggedIn: false };
 }
 
