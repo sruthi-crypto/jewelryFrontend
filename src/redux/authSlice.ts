@@ -40,7 +40,7 @@ export const loginAdmin = createAsyncThunk(
       token: credentials.token ?? credentials.pass ?? "",
     };
 
-    const response = await api("/api/users/login", {
+    const response = await api("/users/login", {
       method: "POST",
       body: JSON.stringify(payload),
     });
