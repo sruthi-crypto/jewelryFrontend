@@ -17,6 +17,12 @@ interface BackendProduct {
   updatedAt?: string;
 }
 
+interface SiteContentResponse {
+  success?: boolean;
+  message?: string;
+  data?: unknown;
+}
+
 interface ProductsState {
   items: Product[];
   storeContent: StoreContent;
@@ -25,31 +31,15 @@ interface ProductsState {
   error: string | null;
 }
 
+// Minimal fallback - content is fetched from backend /site-content
 const defaultAboutUs: AboutUs = {
   eyebrow: "About Us",
-  title: "KUBERA RATNA Fine Jewellery",
-  description: "We craft jewellery that blends timeless elegance with modern detail, made for celebrations that last a lifetime.",
-  mission: "To offer beautifully crafted jewellery with trust, warmth, and lasting value.",
-  since: "2004",
-  images: [
-    {
-      id: "about-main",
-      url: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=80",
-      alt: "Lumina jewellery showcase",
-    },
-  ],
-  highlights: [
-    {
-      id: "highlight-craft",
-      title: "Handcrafted Detail",
-      description: "Each piece is finished with careful craftsmanship and refined design language.",
-    },
-    {
-      id: "highlight-trust",
-      title: "Trusted Experience",
-      description: "Families choose our collections for weddings, gifting, and everyday elegance.",
-    },
-  ],
+  title: "",
+  description: "",
+  mission: "",
+  since: "",
+  images: [],
+  highlights: [],
 };
 
 const defaultStoreContent: StoreContent = {
@@ -129,6 +119,55 @@ function normalizeStoreContent(content?: Partial<StoreContent>): StoreContent {
   };
 }
 
+function isStoreContent(value: unknown): value is Partial<StoreContent> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (("aboutUs" in value && typeof (value as any).aboutUs === "object") ||
+      ("footer" in value && typeof (value as any).footer === "object"))
+  );
+}
+
+function extractStoreContent(value: unknown): Partial<StoreContent> | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  if (isStoreContent(value)) {
+    return {
+      aboutUs: (value as Partial<StoreContent>).aboutUs,
+      footer: (value as Partial<StoreContent>).footer,
+    };
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const content = extractStoreContent(item);
+      if (content) {
+        return content;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function pickStoreContent(response: unknown): Partial<StoreContent> | undefined {
+  if (!response || typeof response !== "object") {
+    return undefined;
+  }
+
+  const maybeResponse = response as SiteContentResponse;
+
+  // The API may return the content directly, or wrapped inside { data: [...] }
+  const directContent = extractStoreContent(maybeResponse);
+  if (directContent) {
+    return directContent;
+  }
+
+  return extractStoreContent(maybeResponse.data);
+}
+
 function detectMediaType(url: string): MediaItem["type"] {
   const normalizedUrl = url.toLowerCase();
 
@@ -197,18 +236,24 @@ export const fetchProducts = createAsyncThunk("products/fetchProducts", async ()
 
 export const fetchStoreContent = createAsyncThunk("products/fetchStoreContent", async () => {
   const response = await api("/site-content");
-  return normalizeStoreContent(response.data as Partial<StoreContent>);
+  return normalizeStoreContent(pickStoreContent(response));
 });
 
 export const saveStoreContent = createAsyncThunk(
   "products/saveStoreContent",
   async (content: StoreContent) => {
+    // Only send aboutUs and footer, without id/key
+    const payload = {
+      aboutUs: content.aboutUs,
+      footer: content.footer,
+    };
+
     const response = await api("/site-content", {
       method: "PUT",
-      body: JSON.stringify(content),
+      body: JSON.stringify(payload),
     });
 
-    return normalizeStoreContent(response.data as Partial<StoreContent>);
+    return normalizeStoreContent(pickStoreContent(response));
   }
 );
 

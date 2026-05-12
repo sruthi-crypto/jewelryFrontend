@@ -787,6 +787,7 @@ export default function UserStore() {
   const navigate = useNavigate();
   const t = useT();
   const products = useAppSelector(s => s.products.items);
+  const productsRef = useRef<HTMLDivElement | null>(null);
 
   const allCategories = Array.from(new Set([
     ...DEFAULT_CATEGORIES,
@@ -804,10 +805,28 @@ export default function UserStore() {
 
   const visibleProducts = products.filter(p => p.available);
   const filtered = visibleProducts.filter(p => {
-    const matchCat = activeCategory === 'all' || p.category === activeCategory;
-    const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
+    const searchValue = search.toLowerCase();
+
+    const matchCat =
+      activeCategory === 'all' || p.category === activeCategory;
+
+    const matchSearch =
+      !searchValue ||
+      p.title.toLowerCase().includes(searchValue) ||
+      p.description.toLowerCase().includes(searchValue) ||
+      p.category.toLowerCase().includes(searchValue);
+
     return matchCat && matchSearch;
   });
+
+  const [hasSearched, setHasSearched] = useState(false);
+
+  useEffect(() => {
+    if (search && !hasSearched) {
+      setHasSearched(true);
+      productsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [search]);
 
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const handleBuyNow = useCallback((product: Product) => {
@@ -967,7 +986,10 @@ export default function UserStore() {
       </section> */}
 
       {/* ── Products ──────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <section
+        ref={productsRef}
+        className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14"
+      >
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-3">
           <div>
             <p className="section-eyebrow">{activeCategory === 'all' ? t.prod_section_eyebrow : ((t as any)[`cat_desc_${activeCategory}`] || '')}</p>
