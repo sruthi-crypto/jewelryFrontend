@@ -16,7 +16,7 @@ const WHATSAPP = '7032716188';
 
 function buildWhatsappMsg(product: Product) {
   return encodeURIComponent(
-    `🪙 *Enquiry — KUBERA RATNA Fine Jewellery*\n\n` +
+    `🪙 *Enquiry — KUBERA RATNA Fine Gemstones *\n\n` +
     `I'm interested in:\n*${product.title}*\nPrice: ₹${product.price.toLocaleString('en-IN')}\n` +
     `${product.discountPercent ? `Discount: ${product.discountPercent}% off\n` : ''}` +
     `\nPlease confirm availability. Thank you! 🙏`
@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
                 KUBERA RATNA
               </span>
               <span className="hidden lg:block font-accent text-[10px] tracking-[0.3em] uppercase mt-0.5" style={{ color: 'var(--nav-text-muted)' }}>
-                Fine Jewellery
+                Fine Gemstones
               </span>
             </div>
 

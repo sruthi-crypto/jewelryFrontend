@@ -69,7 +69,7 @@ export function buildWhatsappMsgFull(items: { product: Product; qty: number }[],
   const total = items.reduce((s, { product, qty }) => s + product.price * qty, 0);
   const savings = items.reduce((s, { product, qty }) => s + ((product.originalPrice ?? product.price) - product.price) * qty, 0);
   return encodeURIComponent(
-    `🪙 *New Order — KUBERA RATNA Fine Jewellery*\n\n👤 *Customer:*\nName: ${customer.name}\nPhone: ${customer.phone}\nEmail: ${customer.email || 'N/A'}\nAddress: ${customer.address}, ${customer.city} — ${customer.pincode}\n${customer.notes ? `Notes: ${customer.notes}\n` : ''}\n🛍️ *Items:*\n${lines.join('\n')}\n\n💰 *Total: ₹${total.toLocaleString('en-IN')}*${savings > 0 ? `\n✅ Savings: ₹${savings.toLocaleString('en-IN')}` : ''}\n\nPlease confirm availability. Thank you! 🙏`
+    `🪙 *New Order — KUBERA RATNA Fine Gemstones*\n\n👤 *Customer:*\nName: ${customer.name}\nPhone: ${customer.phone}\nEmail: ${customer.email || 'N/A'}\nAddress: ${customer.address}, ${customer.city} — ${customer.pincode}\n${customer.notes ? `Notes: ${customer.notes}\n` : ''}\n🛍️ *Items:*\n${lines.join('\n')}\n\n💰 *Total: ₹${total.toLocaleString('en-IN')}*${savings > 0 ? `\n✅ Savings: ₹${savings.toLocaleString('en-IN')}` : ''}\n\nPlease confirm availability. Thank you! 🙏`
   );
 }
 
@@ -869,7 +869,7 @@ export default function UserStore() {
                 KUBERA RATNA
               </span>
               <span className="hidden lg:block font-accent text-[10px] tracking-[0.3em] uppercase mt-0.5" style={{ color: 'var(--nav-text-muted)' }}>
-                Fine Jewellery
+                Fine Gemstones
               </span>
             </div>
 
