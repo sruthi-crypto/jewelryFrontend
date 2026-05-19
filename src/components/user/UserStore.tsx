@@ -819,12 +819,12 @@ export default function UserStore() {
     return matchCat && matchSearch;
   });
 
-  const [hasSearched, setHasSearched] = useState(false);
-
   useEffect(() => {
-    if (search && !hasSearched) {
-      setHasSearched(true);
-      productsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (search.trim()) {
+      productsRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }
   }, [search]);
 
